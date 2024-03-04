@@ -1051,7 +1051,7 @@ def intro_scr2(screen, font):
     m3 = '25 seconds and you will complete 50 rounds to fully evolve the prey. You will do this twice,'
     m4 = ' once where all predator attacks are successful, and another where the predator will be less'
     m5 = 'successful against prey in groups than individuals. The order of the two modes will be randomised.'
-    m6 = 'The total duration will be roughly 50 minutes.  '
+    m6 = 'The total duration will be roughly 30 minutes.  '
     m20 = 'Click anywhere to continue'
 
     show_message(screen, font, m1, (WIDTH//2, HEIGHT*0.37))
