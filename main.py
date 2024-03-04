@@ -18,8 +18,6 @@ import matplotlib.pyplot as plt
 from deap import base, creator, tools
 from operator import attrgetter
 import pandas as pd
-import time
-import datetime
 from sklearn.cluster import MeanShift
 import matplotlib.cm as cm
 import os
@@ -56,9 +54,8 @@ N_BOIDS = 50
 BOID_RADIUS = 1*SCALE
 PRED_RADIUS = 1.5*BOID_RADIUS
 
-
+#need to be calculated as areas
 SEPARATION_AREA = pi * (BOID_RADIUS * 1)**2
-# need to be areas for new calculation to keep shit consistent
 ALIGNMENT_AREA = pi * (BOID_RADIUS * 10)**2
 COHESION_AREA = pi * (BOID_RADIUS * 15)**2
 PREDATOR_FLEE_AREA = pi * (BOID_RADIUS * 15)**2
@@ -78,7 +75,6 @@ def a_list_decoder(input):
         if input == number:
             return i/10
 
-    print("ERROR")
 
 
 def write_new_folder(foldername):
@@ -169,7 +165,7 @@ class Predator:
         return (angle)
 
     def success_calc(self, near_count):
-        # more efficinet and similar end result to calculate near_count individually for each boid, similar becuse they will be in roughly the same position
+        # more efficient and similar end result to calculate near_count individually for each boid, similar becuse they will be in roughly the same position
         if self.success_bool:
             return math.e**(-near_count/(N_BOIDS/1.5))
         else:
@@ -187,7 +183,7 @@ class Predator:
             self.speed = self.const_speed
 
     def move(self, population):
-        # movement function - uses arrow keys and normalises in case two are pressed at once
+        
         if self.auto:
             distance = self.height**2 + self.width**2
             dx = self.width
@@ -240,7 +236,6 @@ class Predator:
                 self.y = HEIGHT
 
     def draw(self, screen):
-        # pygame.draw.circle(screen, (255,0,255), (int(self.x), int(self.y)), BOID_RADIUS*15) #pred hunting distance
 
         if ARROW_KEYS or self.auto:
             pygame.draw.circle(screen, (255, 165, 0),
@@ -287,7 +282,6 @@ class Boid:
 
         self.pred_weight = evolution_vars[1]  # predator weighting var
         self.social_weights = (1-self.pred_weight)/2
-        # this is not mutatable
         self.alignment_weight = evolution_vars[2] * self.social_weights
         self.cohesion_weight = (1 - evolution_vars[2]) * self.social_weights
 
@@ -300,9 +294,8 @@ class Boid:
 
         # heading, initially random
         self.angle = random.uniform(-math.pi, math.pi)
-        # turning radius, pi/50 is okay but find better
         self.turning_radius = BOID_TURNING
-        self.alive = True  # if alive or not, used in pred_attack
+        self.alive = True  
         self.time_of_death = np.NaN
 
         self.radius = BOID_RADIUS  # radius
@@ -322,7 +315,6 @@ class Boid:
         self.near_count = 0  # used for success weighting shiz
 
     def generate_a(self):
-        # 0<a<1.5
 
         return random.choice(potential_a_vals)
 
@@ -365,11 +357,9 @@ class Boid:
 
     def ellipse_calc(self, x, y, area):
         # returns true if found within area else false
-        # area should be in the form radius squared
-        # i must rescale the coordinates to be perpendicular (new x) and para (new y) to bearing for elipse calculations
-
+        
         new_x = x*cos(self.angle-pi/2) - y * \
-            sin(self.angle-pi/2)  # pi/2 looking sus
+            sin(self.angle-pi/2) 
         new_y = x*sin(self.angle-pi/2) + y*cos(self.angle-pi/2)
 
         if ((new_x/self.a)**2 + (new_y/self.b)**2) < area/pi:
@@ -379,7 +369,6 @@ class Boid:
 
     def circle_calc(self, x, y, area):
         # returns true if found within area else false
-        # 'area' should be in the form radius squared, to do this divide it by pi
         if ((x)**2 + (y)**2) < area/pi:
             return True
         else:
@@ -542,7 +531,6 @@ class Boid:
 
         self.boid_force_vec_calc(population)
         self.pred_force_vec_calc(predator)
-        # This needs to be reviewed to find a good balance of Noise vs other weightings
         NOISE = self.noise()
 
         if self.sep_vec[2] != 0:  # seperation given priority
@@ -638,7 +626,7 @@ class Boid:
         # indirectly measures some sociability as well since a boid can react to its peers and avoid the predator without seeing it
         # tried linear and quadratic, mention this in the report
 
-        # adding in 2s for pred delay and removing it from total pred_time
+        # adding in extra time for eating 
         total_time = TIMESTEPS + PRED_PAUSE_TIME * kill_counter
 
         if self.alive:
@@ -649,10 +637,7 @@ class Boid:
             self.fitness = -0.9*p + 1
 
         else:
-            # p = self.total_pred_time / self.time_of_death
-            # #fuck, this is harder to add kill time onto
-            # # self.fitness = 0.1*(p**2) -0.2*p + 0.1
-            # self.fitness = -0.1*p + 0.1
+            
             self.fitness = 0
 
     def mating(self, mate):
@@ -665,7 +650,6 @@ class Boid:
         return offspring_vars
 
     def mutate(self):
-        # does not mutatue social weighting
         r = random.random()
         mid_point = 1/3
         if r < mid_point:
@@ -691,7 +675,6 @@ class Boid:
 
 class Flock:
     def __init__(self, pop_size, W, H, num_gens, respawn=False):
-        # be careful because there could be some indexing funkiness here
         self.num_gens = num_gens
         self.pop_size = pop_size
         self.width = W
@@ -712,13 +695,12 @@ class Flock:
                                                'Gen', 'Timestep', 'Mouse_x', 'Mouse_y', 'Pred_x', 'Pred_y', 'Pred_angle']+[f'Boid_{n}_{axis}' for n in range(self.pop_size) for axis in ['x', 'y', 'angle']])
 
     def add_spacial_statistics(self, predator, timestep):
-        # nan_row = [np.NaN,np.NaN,np.NaN]
         predator_pos = [int(predator.x), int(predator.y),
                         round(predator.angle, 4)]
         mouse_x, mouse_y = pygame.mouse.get_pos()
 
         boid_pop_pos = []
-        for boid in self.original_pop:  # embed in update for loops for efficiency
+        for boid in self.original_pop:  
             if boid.alive:
                 for i in [int(boid.x), int(boid.y), round(boid.angle, 4)]:
                     boid_pop_pos.append(i)
@@ -783,7 +765,6 @@ class Flock:
             social_weight_stats_list.append(round(ind.evolution_vars[2], 1))
 
         mean_fitness = np.mean(self.ind_fitness_list)
-        std_fitness = np.std(self.ind_fitness_list)
 
         stats_row = [self.kill_count, mean_fitness]
         self.stats.iloc[self.generation] = stats_row
@@ -791,13 +772,13 @@ class Flock:
         self.add_pop_attr()
 
     def mate_once(self, parents):
-        # parents is a tuple of size 2, unsure what a tuple is really lol, generated using pick parents
+        # parents is a tuple of size 2, generated using pick parents
         # returns offspring vars
         child = parents[0].mating(parents[1])
         return child
 
     def roulette(self, k):
-        # calculate number of best to be kept using total - num_children
+        # selects individuals with replacement from the population proportional to fitness
         selected = []
 
         for i in range(k):
@@ -862,14 +843,12 @@ class Flock:
                    for vars in new_pop_vars]  # initialise new pop
 
         self.population = new_pop
-        # internal shgould always be 1, might be stuck in the functino now
         self.mutate_population(self.mutation_prob_calc())
         self.original_pop = self.population.copy()
         self.kill_count = 0
 
     def save_stats(self, filepath1='stats.csv', filepath2='spacial_stats.csv', filepath3='attributes.csv'):
-        # saves stats but will currently overwrite itself
-        #
+        
         self.stats.to_csv(filepath1, mode='w')
 
         self.spacial_statistics = self.spacial_statistics.dropna(how='all')
@@ -880,11 +859,9 @@ class Flock:
 
     def get_pop_attr_row(self, gen_index):
         final_attrs = self.pop_attr.iloc[gen_index]
-        # print(final_attrs)
         a_list = final_attrs[::3]
         pw_list = final_attrs[1::3]
         sw_list = final_attrs[2::3]
-        # a_list,pw_list,sw_list = zip(*self.pop_attr.iloc[gen_index])
         self.a_list = np.array(a_list)
         self.pw_list = np.array(pw_list)
         self.sw_list = np.array(sw_list)
@@ -1008,7 +985,6 @@ class Flock:
 
             masked_data = self.pop_attr.iloc[gen_index][lab_mask2]
             row[0] = len(self.cluster_labels[lab_mask1])
-            # row[1] = np.concatenate( (np.zeros(1),self.cluster_centers[i])) #weird shit going on cos theres three features but only two are used for the clustering currently
             row[1] = self.cluster_centers[i]
 
             # iterates through cluster population
@@ -1027,8 +1003,6 @@ class Flock:
                 sd_list[j] = np.sqrt(count/50)
             row[2] = sd_list
             self.cluster_stats.iloc[i] = row
-
-        # print(self.cluster_stats)
 
 
 def show_message(screen, font, message, location):
@@ -1060,6 +1034,7 @@ def intro_scr1(screen, font):
     m4 = 'This research is for a MEng Technical Project. Entry in this study is optional and participants'
     m5 = 'can opt out at any time during the game (but not after, '
     m6 = 'as I will not be able to tell the data is from you).'
+    m20 = 'Click anywhere to continue'
 
     show_message(screen, font, m1, (WIDTH//2, HEIGHT*0.2))
     show_message(screen, font, m2, (WIDTH//2, HEIGHT*0.4))
@@ -1067,6 +1042,7 @@ def intro_scr1(screen, font):
     show_message(screen, font, m4, (WIDTH//2, HEIGHT*0.46))
     show_message(screen, font, m5, (WIDTH//2, HEIGHT*0.49))
     show_message(screen, font, m6, (WIDTH//2, HEIGHT*0.52))
+    show_message(screen, font, m20, (WIDTH//2, HEIGHT*0.75))
 
 
 def intro_scr2(screen, font):
@@ -1076,6 +1052,7 @@ def intro_scr2(screen, font):
     m4 = ' once where all predator attacks are successful, and another where the predator will be less'
     m5 = 'successful against prey in groups than individuals. The order of the two modes will be randomised.'
     m6 = 'The total duration will be roughly 50 minutes.  '
+    m20 = 'Click anywhere to continue'
 
     show_message(screen, font, m1, (WIDTH//2, HEIGHT*0.37))
     show_message(screen, font, m2, (WIDTH//2, HEIGHT*0.4))
@@ -1083,6 +1060,7 @@ def intro_scr2(screen, font):
     show_message(screen, font, m4, (WIDTH//2, HEIGHT*0.46))
     show_message(screen, font, m5, (WIDTH//2, HEIGHT*0.49))
     show_message(screen, font, m6, (WIDTH//2, HEIGHT*0.52))
+    show_message(screen, font, m20, (WIDTH//2, HEIGHT*0.75))
 
 
 def consent_check(screen, font):
@@ -1090,10 +1068,11 @@ def consent_check(screen, font):
     m2 = 'and mouse in the game. No further data will be recorded and I will delete your'
     m3 = 'email if you send data via email as soon as I have downloaded the attached data.'
     m4 = 'Because all data is anonymous, I cannot delete your data once you have taken part.'
-    m5 = 'In case you have questions of concerns about this study, please contact myself (hb20788@bristol.ac.uk),'
-    m6 = 'my project supervisor (nikolai.bode@bristol.ac.uk),'
-    m7 = 'or research governance (research-governance@bristol.ac.uk)'
-    m8 = 'By clicking this box, I consent to the above data being collected:'
+    m5 = 'In case you have questions of concerns about this study, please contact '
+    m6 = 'myself (hb20788@bristol.ac.uk),'
+    m7 = 'my project supervisor (nikolai.bode@bristol.ac.uk),'
+    m8 = 'or research governance (research-governance@bristol.ac.uk).'
+    m9 = 'By clicking this box, I consent to the above data being collected:'
 
     show_message(screen, font, m1, (WIDTH//2, HEIGHT*0.37))
     show_message(screen, font, m2, (WIDTH//2, HEIGHT*0.4))
@@ -1102,7 +1081,8 @@ def consent_check(screen, font):
     show_message(screen, font, m5, (WIDTH//2, HEIGHT*0.49))
     show_message(screen, font, m6, (WIDTH//2, HEIGHT*0.52))
     show_message(screen, font, m7, (WIDTH//2, HEIGHT*0.55))
-    show_message(screen, font, m8, (WIDTH//2-50, HEIGHT*0.65))
+    show_message(screen, font, m8, (WIDTH//2, HEIGHT*0.58))
+    show_message(screen, font, m9, (WIDTH//2-50, HEIGHT*0.65))
 
     pygame.draw.rect(screen, (255, 0, 0), (WIDTH / 2 +
                      225, HEIGHT * 0.65 - 12.5, 25, 25), 5)
@@ -1112,28 +1092,36 @@ def instructions(screen, font):
     m1 = 'You will direct the predator with your mouse and you must aim to catch as many'
     m2 = 'of the prey as you can in each round. Please consider your hunting strategy?'
     m3 = 'Press the spacebar at any time to pause the game.'
+    m20 = 'Click anywhere to continue'
 
     show_message(screen, font, m1, (WIDTH//2, HEIGHT*0.37))
     show_message(screen, font, m2, (WIDTH//2, HEIGHT*0.40))
     show_message(screen, font, m3, (WIDTH//2, HEIGHT*0.43))
+    show_message(screen, font, m20, (WIDTH//2, HEIGHT*0.75))
 
 
 def init_normal(screen, font):
     m1 = 'In this round, the predator will always be successful'
+    m20 = 'Click anywhere to start'
     show_message(screen, font, m1, (WIDTH//2, HEIGHT*0.37))
+    show_message(screen, font, m20, (WIDTH//2, HEIGHT*0.75))
 
 
 def init_success(screen, font):
     m1 = 'In this round, the predators success rate will fall proportional to the'
     m2 = 'number of neighbours the prey has.'
+    m20 = 'Click anywhere to start'
     show_message(screen, font, m1, (WIDTH//2, HEIGHT*0.37))
     show_message(screen, font, m2, (WIDTH//2, HEIGHT*0.40))
+    show_message(screen, font, m20, (WIDTH//2, HEIGHT*0.75))
 
 
 def break_screen(screen, font):
     m1 = "Woohoo! You're halfway there! Here's a chance to take a break :)"
+    m20 = 'Click anywhere to continue'
 
     show_message(screen, font, m1, (WIDTH//2, HEIGHT*0.37))
+    show_message(screen, font, m20, (WIDTH//2, HEIGHT*0.75))
 
 
 def finished_screen(screen, font):
@@ -1178,7 +1166,7 @@ def save_previous_state(previous_state, current_state):
         return current_state
 
 
-def state_update(previous_state, state, run_type_memory, halfway_bool):
+def state_update(previous_state, state, run_type_memory, halfway_bool, folder_path):
 
     for event in pygame.event.get():
 
@@ -1251,10 +1239,14 @@ def state_update(previous_state, state, run_type_memory, halfway_bool):
                     halfway_bool = True
 
                     if run_type_memory == STATE_INIT_SUCCESS_PREDATOR:
+                        order = 'success then normal'
                         state = STATE_INIT_NORMAL_PREDATOR
 
                     elif run_type_memory == STATE_INIT_NORMAL_PREDATOR:
+                        order = 'normal then success'
                         state = STATE_INIT_SUCCESS_PREDATOR
+                    with open(folder_path + 'run_order.txt', "w") as file:
+                        file.write(order)
 
             elif state == STATE_FINISHED:
                 pass
@@ -1291,10 +1283,10 @@ def player_run(NUM_GENS):
 
     state = STATE_INIT
     previous_state = STATE_INIT
-    folder_path = write_new_folder('hb20788')
+    folder_path = write_new_folder('OUTPUT')
     pygame.init()
     screen = pygame.display.set_mode((WIDTH, HEIGHT))
-    pygame.display.set_caption("DISS TITLE HERE")
+    pygame.display.set_caption("Using a virtual experiment to model the evolution of sociability and vision in prey")
     font_48 = pygame.font.Font(None, 48)
     font_24 = pygame.font.Font(None, 24)
     WHITE = (255, 255, 255)
@@ -1311,7 +1303,7 @@ def player_run(NUM_GENS):
         screen.fill((255, 255, 255))
 
         state, previous_state, run_type_memory, halfway_bool = state_update(
-            previous_state, state, run_type_memory, halfway_bool)
+            previous_state, state, run_type_memory, halfway_bool, folder_path)
 
         if state == STATE_INIT:
             intro_scr1(screen, font_24)
