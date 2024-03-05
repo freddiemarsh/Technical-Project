@@ -37,11 +37,26 @@ SCALE = 10
 # THESE MUST ALL BE INT VALUES
 FPS = 60  # for player simulations, capped at 60 - if doing auto sim can use 30 or probably 15
 TIMESTEPS = 20*FPS
-NUM_GENS = 50
+NUM_GENS = 40
 
 
 PRED_PAUSE_TIME = round(0.5 * FPS, 1)  # 1 * FPS = 1 second
-WIDTH, HEIGHT = 800, 800  # 0,0 is at top left!!!!!!
+
+pygame.init()
+current_width, current_height = pygame.display.Info().current_w, pygame.display.Info().current_h
+pygame.quit()
+    
+    # Calculate scaling factor
+def scale_dimensions(current_width, current_height):
+
+    # Calculate the scaling factor based on the current resolution compared to the desired resolution.
+ 
+    scale_x = current_width / 800
+    scale_y = current_height / 800
+    return min(scale_x, scale_y)
+scaling_factor = scale_dimensions(current_width, current_height)
+WIDTH, HEIGHT = 800*scaling_factor, 800*scaling_factor  # 0,0 is at top left!!!!!!
+print(WIDTH)
 
 BOID_TURNING = pi/FPS
 PRED_TURNING = (3/2) * BOID_TURNING
@@ -99,13 +114,7 @@ def write_new_folder(foldername):
     return new_directory + str('/')
 
 
-def scale_dimensions(current_width, current_height):
 
-    # Calculate the scaling factor based on the current resolution compared to the desired resolution.
- 
-    scale_x = current_width / WIDTH
-    scale_y = current_height / HEIGHT
-    return min(scale_x, scale_y)
 
 
 def scatter_hist(x, y, ax, ax_histx, ax_histy, filepath):
@@ -1057,10 +1066,10 @@ def intro_scr1(screen, font):
 def intro_scr2(screen, font):
     m1 = 'In this game, you will control a predator marked by a red arrow which will move towards your mouse.'
     m2 = 'Your aim is to catch as many of the prey as you can in the time limit. Each round will last around'
-    m3 = '25 seconds and you will complete 50 rounds to fully evolve the prey. You will do this twice,'
+    m3 = '25 seconds and you will complete 40 rounds to fully evolve the prey. You will do this twice,'
     m4 = ' once where all predator attacks are successful, and another where the predator will be less'
     m5 = 'successful against prey in groups than individuals. The order of the two modes will be randomised.'
-    m6 = 'The total duration will be roughly 50 minutes.  '
+    m6 = 'The total duration will be roughly 30 minutes.  '
     m20 = 'Click anywhere to continue'
 
     show_message(screen, font, m1, (WIDTH//2, HEIGHT*0.37))
@@ -1295,11 +1304,9 @@ def player_run(NUM_GENS):
     folder_path = write_new_folder('OUTPUT')
     pygame.init()
 
-    current_width, current_height = pygame.display.Info().current_w, pygame.display.Info().current_h
     
     # Calculate scaling factor
-    scaling_factor = scale_dimensions(current_width, current_height)
-    screen = pygame.display.set_mode((int(WIDTH * scaling_factor), int(HEIGHT * scaling_factor)))
+    screen = pygame.display.set_mode((int(WIDTH), int(HEIGHT)))
 
 
 
