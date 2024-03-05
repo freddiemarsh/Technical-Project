@@ -36,7 +36,7 @@ SCALE = 10
 
 # THESE MUST ALL BE INT VALUES
 FPS = 60  # for player simulations, capped at 60 - if doing auto sim can use 30 or probably 15
-TIMESTEPS = 2*FPS
+TIMESTEPS = 20*FPS
 NUM_GENS = 50
 
 
@@ -97,6 +97,15 @@ def write_new_folder(foldername):
             new_directory += str(i)
         i += 1
     return new_directory + str('/')
+
+
+def scale_dimensions(current_width, current_height):
+
+    # Calculate the scaling factor based on the current resolution compared to the desired resolution.
+ 
+    scale_x = current_width / WIDTH
+    scale_y = current_height / HEIGHT
+    return min(scale_x, scale_y)
 
 
 def scatter_hist(x, y, ax, ax_histx, ax_histy, filepath):
@@ -1051,7 +1060,7 @@ def intro_scr2(screen, font):
     m3 = '25 seconds and you will complete 50 rounds to fully evolve the prey. You will do this twice,'
     m4 = ' once where all predator attacks are successful, and another where the predator will be less'
     m5 = 'successful against prey in groups than individuals. The order of the two modes will be randomised.'
-    m6 = 'The total duration will be roughly 30 minutes.  '
+    m6 = 'The total duration will be roughly 50 minutes.  '
     m20 = 'Click anywhere to continue'
 
     show_message(screen, font, m1, (WIDTH//2, HEIGHT*0.37))
@@ -1285,7 +1294,16 @@ def player_run(NUM_GENS):
     previous_state = STATE_INIT
     folder_path = write_new_folder('OUTPUT')
     pygame.init()
-    screen = pygame.display.set_mode((WIDTH, HEIGHT))
+
+    current_width, current_height = pygame.display.Info().current_w, pygame.display.Info().current_h
+    
+    # Calculate scaling factor
+    scaling_factor = scale_dimensions(current_width, current_height)
+    screen = pygame.display.set_mode((int(WIDTH * scaling_factor), int(HEIGHT * scaling_factor)))
+
+
+
+    # screen = pygame.display.set_mode((WIDTH, HEIGHT))
     pygame.display.set_caption("Using a virtual experiment to model the evolution of sociability and vision in prey")
     font_48 = pygame.font.Font(None, 48)
     font_24 = pygame.font.Font(None, 24)
