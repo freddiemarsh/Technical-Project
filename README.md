@@ -9,7 +9,9 @@ Description here
   - [Installation](#installation)
 - [Usage](#usage)
 ## Overview
-TBA
+
+This project aims to explore how evolutionary pressure from a human controlled predator effects the swarming behaviour and field of view of a computer simulated prey. To do this, you will play a basic game. Please install the required packages from the requirements.txt folder and fill out the player form before starting. This will explain the game and describe how your data will be collected and used. Thanks, Freddie.
+
 ## Setup
 ### Prerequisites
 - [Python 3.6 or higher](https://www.python.org/downloads/)
