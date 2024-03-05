@@ -1,9 +1,4 @@
-'''
-final UI implimented
 
-
-
-'''
 
 
 import pygame
@@ -56,7 +51,6 @@ def scale_dimensions(current_width, current_height):
     return min(scale_x, scale_y)
 scaling_factor = scale_dimensions(current_width, current_height)
 WIDTH, HEIGHT = 800*scaling_factor, 800*scaling_factor  # 0,0 is at top left!!!!!!
-print(WIDTH)
 
 BOID_TURNING = pi/FPS
 PRED_TURNING = (3/2) * BOID_TURNING
@@ -1268,9 +1262,11 @@ def state_update(previous_state, state, run_type_memory, halfway_bool, folder_pa
 
             elif state == STATE_FINISHED:
                 pass
+            elif state == STATE_PAUSE:
+                pass
 
             else:
-                state = STATE_NO_STATE
+                pass
 
         elif state == STATE_BREAK:
             if halfway_bool == True:
@@ -1382,10 +1378,10 @@ def player_run(NUM_GENS):
                 PREDATOR.update(screen, FLOCK.population)
                 FLOCK.update_flock(screen, PREDATOR, itteration)
 
-                font = pygame.font.Font(None, 36)
+                font = pygame.font.Font(None, 24)
                 text = font.render(
                     f"TIME: {round(itteration/FPS,1)}, GENERATION: {FLOCK.generation+1}/{NUM_GENS}, KILLS: {FLOCK.kill_count}/{N_BOIDS}, SUCCESS: CONSTANT", True, (255, 255, 255))
-                screen.blit(text, (10, 10))
+                screen.blit(text, (20, 20))
 
             else:
                 FLOCK.flock_fitness()
@@ -1432,10 +1428,10 @@ def player_run(NUM_GENS):
                 PREDATOR.update(screen, FLOCK.population)
                 FLOCK.update_flock(screen, PREDATOR, itteration)
 
-                font = pygame.font.Font(None, 36)
+                font = pygame.font.Font(None, 24)
                 text = font.render(
                     f"TIME: {round(itteration/FPS,1)}, GENERATION: {FLOCK.generation+1}/{NUM_GENS}, KILLS: {FLOCK.kill_count}/{N_BOIDS}, SUCCESS: VARIABLE", True, (255, 255, 255))
-                screen.blit(text, (10, 10))
+                screen.blit(text, (20, 20))
 
             else:
 
