@@ -1470,4 +1470,4 @@ def player_run(NUM_GENS):
         pygame.display.flip()
 
 
-player_run(2)
+player_run(40)
