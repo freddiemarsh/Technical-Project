@@ -24,6 +24,8 @@ You will direct the predator with your mouse and you must aim to catch as many o
 
 Running the code will produce an output folder containing all the simulation data. You can find this in the same folder as main.py. Please email the whole output folder called 'OUTPUT' to Freddie Marsh at hb20788@bristol.ac.uk. You may find it easier to compress the folder first.
 
+PS The first time running the game can take around 30 seconds to launch.
+
 
 
 ## Setup
