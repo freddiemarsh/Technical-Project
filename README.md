@@ -22,6 +22,7 @@ This study will collect your age, gender and the positional data of your predato
 
 You will direct the predator with your mouse and you must aim to catch as many of the prey as you can in each round. The predator will be stationary for the start of each round to allow the prey to form groups. The predator will also be stationary when for a short period of time after attempting an attack. Finally, the boundaries for the prey can be passed through resulting in them appearing on the other side of the screen. They are solid for the predator. Consider how the different game modes could affect your hunting strategies. Press the spacebar at any time to pause the game or exit.
 
+Running the code will produce an output folder containing all the simulation data. You can find this in the same folder as main.py. Please email the whole output folder called 'OUTPUT' to Freddie Marsh at hb20788@bristol.ac.uk. You may find it easier to compress the folder first.
 
 
 
@@ -31,7 +32,7 @@ You will direct the predator with your mouse and you must aim to catch as many o
 ### Installation
 Clone the repository to your local machine:
 ```bash
-git clone <repository url>
+git clone https://github.com/freddiemarsh/Technical-Project.git
 ```
 Change to the project directory:
 ```bash
@@ -47,10 +48,7 @@ Run the program in your terminal
 ```bash
 python main.py
 ```
-Or run using a source code editor like Visual Studio Code
+**Or run using a source code editor like Visual Studio Code**
 
-## Submit your data
-Running the code will produce an output folder containing all the simulation data. You can find this in the same folder as main.py.
-Please email the whole output folder called 'OUTPUT' to Freddie Marsh at hb20788@bristol.ac.uk. You may find it easier to compress the folder first.
 
 
