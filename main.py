@@ -1,6 +1,5 @@
 
 
-
 import pygame
 import random
 import math
@@ -27,7 +26,7 @@ cursor_x, cursor_y = 0, 0
 
 
 PRED_VIEWING_RANGE = pi/3  # Irrelevent for auto_sim
-SCALE = 10
+
 
 # THESE MUST ALL BE INT VALUES
 FPS = 60  # for player simulations, capped at 60 - if doing auto sim can use 30 or probably 15
@@ -38,24 +37,32 @@ NUM_GENS = 40
 PRED_PAUSE_TIME = round(0.5 * FPS, 1)  # 1 * FPS = 1 second
 
 pygame.init()
-current_width, current_height = pygame.display.Info().current_w, pygame.display.Info().current_h
+current_width, current_height = pygame.display.Info(
+).current_w, pygame.display.Info().current_h
 pygame.quit()
-    
-    # Calculate scaling factor
+
+# Calculate scaling factor
+
+
 def scale_dimensions(current_width, current_height):
 
     # Calculate the scaling factor based on the current resolution compared to the desired resolution.
- 
+
     scale_x = current_width / 800
     scale_y = current_height / 800
     return min(scale_x, scale_y)
+
+
 scaling_factor = scale_dimensions(current_width, current_height)
-WIDTH, HEIGHT = 800*scaling_factor, 800*scaling_factor  # 0,0 is at top left!!!!!!
+WIDTH, HEIGHT = 800*scaling_factor, 800 * \
+    scaling_factor  # 0,0 is at top left!!!!!!
+
+SCALE = 10 * scaling_factor
 
 BOID_TURNING = pi/FPS
 PRED_TURNING = (3/2) * BOID_TURNING
 BOID_ALPHA = pi/6
-BOID_SPEED = 120 / FPS
+BOID_SPEED = 120 / FPS * scaling_factor
 PRED_SPEED = 1.5 * BOID_SPEED
 
 
@@ -63,13 +70,13 @@ N_BOIDS = 50
 BOID_RADIUS = 1*SCALE
 PRED_RADIUS = 1.5*BOID_RADIUS
 
-#need to be calculated as areas
+# need to be calculated as areas
 SEPARATION_AREA = pi * (BOID_RADIUS * 1)**2
 ALIGNMENT_AREA = pi * (BOID_RADIUS * 10)**2
 COHESION_AREA = pi * (BOID_RADIUS * 15)**2
 PREDATOR_FLEE_AREA = pi * (BOID_RADIUS * 15)**2
 PRED_RANGE = BOID_RADIUS * 15  # this is the pred radius
-NOISE_WEIGHT = 0.3
+NOISE_WEIGHT = 0.25
 
 
 # even spacing where midpoint is 1 under recipricol
@@ -83,7 +90,6 @@ def a_list_decoder(input):
     for i, number in enumerate(potential_a_vals):
         if input == number:
             return i/10
-
 
 
 def write_new_folder(foldername):
@@ -106,9 +112,6 @@ def write_new_folder(foldername):
             new_directory += str(i)
         i += 1
     return new_directory + str('/')
-
-
-
 
 
 def scatter_hist(x, y, ax, ax_histx, ax_histy, filepath):
@@ -195,7 +198,7 @@ class Predator:
             self.speed = self.const_speed
 
     def move(self, population):
-        
+
         if self.auto:
             distance = self.height**2 + self.width**2
             dx = self.width
@@ -293,7 +296,7 @@ class Boid:
         self.b = 1/self.a  # horrizontal axis of ellipse
 
         self.pred_weight = evolution_vars[1]  # predator weighting var
-        self.social_weights = (1-self.pred_weight)/2
+        self.social_weights = (1-self.pred_weight)
         self.alignment_weight = evolution_vars[2] * self.social_weights
         self.cohesion_weight = (1 - evolution_vars[2]) * self.social_weights
 
@@ -307,7 +310,7 @@ class Boid:
         # heading, initially random
         self.angle = random.uniform(-math.pi, math.pi)
         self.turning_radius = BOID_TURNING
-        self.alive = True  
+        self.alive = True
         self.time_of_death = np.NaN
 
         self.radius = BOID_RADIUS  # radius
@@ -369,9 +372,9 @@ class Boid:
 
     def ellipse_calc(self, x, y, area):
         # returns true if found within area else false
-        
+
         new_x = x*cos(self.angle-pi/2) - y * \
-            sin(self.angle-pi/2) 
+            sin(self.angle-pi/2)
         new_y = x*sin(self.angle-pi/2) + y*cos(self.angle-pi/2)
 
         if ((new_x/self.a)**2 + (new_y/self.b)**2) < area/pi:
@@ -453,8 +456,7 @@ class Boid:
     def noise(self):
         # finds noise value in angle form, convert it to force vector, definition of trig -> normalised
 
-        noise = self.pi_range(
-            random.uniform(-self.turning_radius, self.turning_radius) + self.angle)
+        noise = self.pi_range(random.uniform(-pi, pi) + self.angle)
 
         return [cos(noise), sin(noise)]
 
@@ -553,13 +555,7 @@ class Boid:
             TOTAL_FORCE = [self.ali_vec[0] * self.alignment_weight + self.coh_vec[0] * self.cohesion_weight + self.pre_vec[0] * self.pred_weight + NOISE_WEIGHT * NOISE[0],
                            self.ali_vec[1] * self.alignment_weight + self.coh_vec[1] * self.cohesion_weight + self.pre_vec[1] * self.pred_weight + NOISE_WEIGHT * NOISE[1]]
 
-        count_sum = self.sep_vec[2] + self.ali_vec[2] + \
-            self.coh_vec[2] + self.pre_vec[2]
-
-        if count_sum == 0:
-            desired_heading = self.angle
-
-        elif TOTAL_FORCE[0]**2 + TOTAL_FORCE[1]**2 == 0:
+        if TOTAL_FORCE[0]**2 + TOTAL_FORCE[1]**2 == 0:
             desired_heading = self.angle
 
         else:
@@ -575,8 +571,8 @@ class Boid:
         self.move()
 
     def draw(self, screen, predator):
-        col_num = 255*self.evolution_vars[2]
-        colour = (col_num, 0, 255)
+
+        colour = (255, 255, 255)
 
         if PRED_FOV:
             if self.seen_by_pred(predator):
@@ -638,7 +634,7 @@ class Boid:
         # indirectly measures some sociability as well since a boid can react to its peers and avoid the predator without seeing it
         # tried linear and quadratic, mention this in the report
 
-        # adding in extra time for eating 
+        # adding in extra time for eating
         total_time = TIMESTEPS + PRED_PAUSE_TIME * kill_counter
 
         if self.alive:
@@ -649,7 +645,7 @@ class Boid:
             self.fitness = -0.9*p + 1
 
         else:
-            
+
             self.fitness = 0
 
     def mating(self, mate):
@@ -712,7 +708,7 @@ class Flock:
         mouse_x, mouse_y = pygame.mouse.get_pos()
 
         boid_pop_pos = []
-        for boid in self.original_pop:  
+        for boid in self.original_pop:
             if boid.alive:
                 for i in [int(boid.x), int(boid.y), round(boid.angle, 4)]:
                     boid_pop_pos.append(i)
@@ -832,12 +828,12 @@ class Flock:
                 i.rewrite_evolution_vars()
 
     def mutation_prob_calc(self):
-        # if self.generation < self.num_gens/3:
-        #     return 0.2
-        # elif self.generation < 2*self.num_gens/3:
-        #     return 0.1
-        # else:
-        return 0.05
+        if self.generation < self.num_gens/4:
+            return 0.2
+        elif self.generation < 2*self.num_gens/2:
+            return 0.1
+        else:
+            return 0.05
 
     def next_generation(self):
         # creates new population using mating and tournament selection
@@ -860,7 +856,7 @@ class Flock:
         self.kill_count = 0
 
     def save_stats(self, filepath1='stats.csv', filepath2='spacial_stats.csv', filepath3='attributes.csv'):
-        
+
         self.stats.to_csv(filepath1, mode='w')
 
         self.spacial_statistics = self.spacial_statistics.dropna(how='all')
@@ -925,8 +921,6 @@ class Flock:
             (self.a_list, self.pw_list, self.sw_list))
         np.savetxt('array_data.csv', self.MSdata, delimiter=',')
 
-        # self.MSdata = self.pop_attr.iloc[gen_index]
-        # print(self.MSdata)
         meanshift = MeanShift(bandwidth=np.sqrt(3*0.1**2))
 
         # Fit the model
@@ -977,8 +971,6 @@ class Flock:
                 n_clusters)] + ['Cluster Centers'], loc='upper right')
             plt.draw()
 
-            # print("Number of clusters:", n_clusters)
-
     def calc_cluster_stats(self, gen_index):
         # again just does pw/sw but this is the easiest one to adjust, just fiddle with cluster centre values
         self.calc_MS_cluster(gen_index)
@@ -993,7 +985,6 @@ class Flock:
             lab_mask1 = self.cluster_labels == i
             # trebled so mask is expanded from 50 3d lists to 150 points
             lab_mask2 = [element for element in lab_mask1 for _ in range(3)]
-            # print(self.pop_attr.iloc[-1])
 
             masked_data = self.pop_attr.iloc[gen_index][lab_mask2]
             row[0] = len(self.cluster_labels[lab_mask1])
@@ -1102,13 +1093,23 @@ def consent_check(screen, font):
 
 def instructions(screen, font):
     m1 = 'You will direct the predator with your mouse and you must aim to catch as many'
-    m2 = 'of the prey as you can in each round. Please consider your hunting strategy?'
-    m3 = 'Press the spacebar at any time to pause the game.'
+    m2 = 'of the prey as you can in each round. The predator will be stationary for the ' 
+    m3 = 'start of each round to allow the prey to form groups. The predator will also be'
+    m4 = 'stationary when for a short period of time after attempting an attack. Finally, '
+    m5 = 'the boundaries for the prey can be passed through resulting in them appearing on '
+    m6 = 'the other side of the screen. They are solid for the predator.' 
+    m7 = 'Consider how the different game modes could affect your hunting strategies.'
+    m8 = 'Press the spacebar at any time to pause the game or exit.'
     m20 = 'Click anywhere to continue'
 
     show_message(screen, font, m1, (WIDTH//2, HEIGHT*0.37))
     show_message(screen, font, m2, (WIDTH//2, HEIGHT*0.40))
     show_message(screen, font, m3, (WIDTH//2, HEIGHT*0.43))
+    show_message(screen, font, m4, (WIDTH//2, HEIGHT*0.46))
+    show_message(screen, font, m5, (WIDTH//2, HEIGHT*0.49))
+    show_message(screen, font, m6, (WIDTH//2, HEIGHT*0.52))
+    show_message(screen, font, m7, (WIDTH//2, HEIGHT*0.55))
+    show_message(screen, font, m8, (WIDTH//2, HEIGHT*0.61))
     show_message(screen, font, m20, (WIDTH//2, HEIGHT*0.75))
 
 
@@ -1145,6 +1146,8 @@ def finished_screen(screen, font):
     show_message(screen, font, m2, (WIDTH//2, HEIGHT*0.4))
     show_message(screen, font, m3, (WIDTH//2, HEIGHT*0.43))
 
+### FSA STATES ###
+
 
 STATE_INIT = 0
 STATE_SCR2 = 1
@@ -1161,7 +1164,6 @@ STATE_SUCCESS_PREDATOR_IT_TICK = 9
 
 STATE_BREAK = 20
 STATE_FINISHED = 21
-
 
 STATE_PAUSE = 50
 STATE_ESC_CHECK = 51
@@ -1300,14 +1302,12 @@ def player_run(NUM_GENS):
     folder_path = write_new_folder('OUTPUT')
     pygame.init()
 
-    
     # Calculate scaling factor
     screen = pygame.display.set_mode((int(WIDTH), int(HEIGHT)))
 
-
-
     # screen = pygame.display.set_mode((WIDTH, HEIGHT))
-    pygame.display.set_caption("Using a virtual experiment to model the evolution of sociability and vision in prey")
+    pygame.display.set_caption(
+        "Using a virtual experiment to model the evolution of sociability and vision in prey")
     font_48 = pygame.font.Font(None, 48)
     font_24 = pygame.font.Font(None, 24)
     WHITE = (255, 255, 255)
@@ -1385,7 +1385,9 @@ def player_run(NUM_GENS):
 
             else:
                 FLOCK.flock_fitness()
-                FLOCK.next_generation()
+                if gen_num != NUM_GENS:
+                    FLOCK.next_generation()
+
                 previous_state = save_previous_state(previous_state, state)
                 state = STATE_NORMAL_PREDATOR
 
@@ -1436,7 +1438,8 @@ def player_run(NUM_GENS):
             else:
 
                 FLOCK.flock_fitness()
-                FLOCK.next_generation()
+                if gen_num != NUM_GENS:
+                    FLOCK.next_generation()
                 previous_state = save_previous_state(previous_state, state)
                 state = STATE_SUCCESS_PREDATOR
 
@@ -1467,4 +1470,4 @@ def player_run(NUM_GENS):
         pygame.display.flip()
 
 
-player_run(1)
+player_run(5)
