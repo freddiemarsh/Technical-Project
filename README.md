@@ -10,11 +10,11 @@ Description here
 - [Usage](#usage)
 ## Overview
 
-This project aims to explore how evolutionary pressure from a human controlled predator effects the swarming behaviour and field of view of a computer simulated prey. To do this, you will play a basic game. Please install the required packages from the 'requirements.txt' folder and fill out the player form before starting. To run the game, simply run the 'main.py' file from either your terminal or a source code editor. This will explain the game and describe how your data will be collected and used. Thanks, Freddie.
+This project aims to explore how evolutionary pressure from a human controlled predator effects the swarming behaviour and field of view of a computer simulated prey. To do this, you will play a basic game. Based on your hunting strategy over successive generations, the prey will become more or less likely to group together. Please install the required packages from the 'requirements.txt' folder and fill out the player form before starting. To run the game, simply run the 'main.py' file from either your terminal or a source code editor. This will explain the game and describe how your data will be collected and used. Thanks, Freddie.
 
 ## Instructions
 
-This research is for a MEng Technical Project. Entry in this study is optional and participants can opt out at any time during the game (but not after, as I will not be able to tell the data is from you).
+This research is for a MEng Technical Project. Entry in this study is optional and participants can opt out at any time during the game (but not after, as I will not be able to tell the data is from you). Before the game, please fill out the Player Form and please remember to submit your data after.
 
 In this game, you will control a predator marked by a red arrow which will move towards your mouse. Your aim is to catch as many of the prey as you can in the time limit. Each round will last around 25 seconds and you will complete 40 rounds to fully evolve the prey. You will do this twice, once where all predator attacks are successful, and another where the predator will be less successful against prey in groups than individuals. The order of the two modes will be randomised. The total duration will be roughly 30 minutes.  
 
