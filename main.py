@@ -182,7 +182,7 @@ class Predator:
     def success_calc(self, near_count):
         # more efficient and similar end result to calculate near_count individually for each boid, similar becuse they will be in roughly the same position
         if self.success_bool:
-            return math.e**(-near_count/(N_BOIDS/1.5))
+            return math.e**(-near_count/(N_BOIDS/3))
         else:
             return 1
 
