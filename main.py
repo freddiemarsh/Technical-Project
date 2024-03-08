@@ -29,7 +29,7 @@ PRED_VIEWING_RANGE = pi/3  # Irrelevent for auto_sim
 
 
 # THESE MUST ALL BE INT VALUES
-FPS = 60  # for player simulations, capped at 60 - if doing auto sim can use 30 or probably 15
+FPS = 40  # for player simulations, capped at 60 - if doing auto sim can use 30 or probably 15
 TIMESTEPS = 20*FPS
 NUM_GENS = 40
 
