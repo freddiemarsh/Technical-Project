@@ -304,8 +304,8 @@ class Boid:
         self.height = HEIGHT
         self.speed = BOID_SPEED
 
-        self.x = random.randint(0, self.width)  # random starting position
-        self.y = random.randint(0, self.height)
+        self.x = random.randint(0, int(self.width))  # random starting position
+        self.y = random.randint(0, int(self.height))
 
         # heading, initially random
         self.angle = random.uniform(-math.pi, math.pi)
