@@ -1,5 +1,4 @@
 #  Technical Project 
-Description here
 
 
 ## Table of Contents
